@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riddle Challenge</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8ff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+        h1 {
+            color: #3498db;
+            margin-bottom: 20px;
+        }
+        .score-display {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #2c3e50;
+        }
+        .riddle-container {
+            background-color: #edf6ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .riddle-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+            min-height: 24px;
+        }
+        .correct {
+            color: #27ae60;
+        }
+        .incorrect {
+            color: #e74c3c;
+        }
+        .hint-button {
+            background-color: #f39c12;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .hint-button:hover {
+            background-color: #e67e22;
+        }
+        .hint-text {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Riddle Challenge</h1>
+        <div class="score-display">Score: <span id="score">0</span></div>
+        <div class="riddle-container">
+            <div class="riddle-text" id="riddle-text"></div>
+            <input type="text" id="answer-input" placeholder="Type your answer here...">
+            <button class="btn" id="submit-btn">Submit Answer</button>
+            <button class="hint-button" id="hint-btn">Get Hint</button>
+            <div class="hint-text" id="hint-text"></div>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        <button class="btn" id="next-btn" style="display: none;">Next Riddle</button>
+    </div>
+
+    <script>
+        const riddles = [
+            {
+                question: "I speak without a mouth and hear without ears. I have no body, but I come alive with wind. What am I?",
+                answer: "echo",
+                hint: "Think about sounds that come back to you."
+            },
+            {
+                question: "The more you take, the more you leave behind. What am I?",
+                answer: "footsteps",
+                hint: "Think about what happens when you walk."
+            },
+            {
+                question: "I have cities, but no houses. I have mountains, but no trees. I have water, but no fish. What am I?",
+                answer: "map",
+                hint: "You use this to find your way."
+            },
+            {
+                question: "What has a head, a tail, but no body?",
+                answer: "coin",
+                hint: "You might find this in your pocket."
+            },
+            {
+                question: "I'm tall when I'm young, and short when I'm old. What am I?",
+                answer: "candle",
+                hint: "I provide light as I slowly disappear."
+            },
+            {
+                question: "What is always in front of you but can't be seen?",
+                answer: "future",
+                hint: "It's related to time."
+            },
+            {
+                question: "What can you break, even if you never pick it up or touch it?",
+                answer: "promise",
+                hint: "It's something you give to someone."
+            },
+            {
+                question: "What has many keys but can't open a single lock?",
+                answer: "piano",
+                hint: "It makes beautiful music."
+            },
+            {
+                question: "What gets wet while drying?",
+                answer: "towel",
+                hint: "You use this after a shower."
+            },
+            {
+                question: "I'm light as a feather, but even the strongest person can't hold me for more than a few minutes. What am I?",
+                answer: "breath",
+                hint: "You do this automatically, all day long."
+            }
+        ];
+
+        let currentRiddleIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const riddleText = document.getElementById('riddle-text');
+        const answerInput = document.getElementById('answer-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackEl = document.getElementById('feedback');
+        const scoreEl = document.getElementById('score');
+        const hintBtn = document.getElementById('hint-btn');
+        const hintText = document.getElementById('hint-text');
+
+        function loadRiddle() {
+            const currentRiddle = riddles[currentRiddleIndex];
+            riddleText.textContent = currentRiddle.question;
+            answerInput.value = '';
+            feedbackEl.textContent = '';
+            feedbackEl.className = 'feedback';
+            submitBtn.style.display = 'inline-block';
+            nextBtn.style.display = 'none';
+            isAnswered = false;
+            hintText.style.display = 'none';
+        }
+
+        function checkAnswer() {
+            if (isAnswered) return;
+            
+            const userAnswer = answerInput.value.trim().toLowerCase();
+            const correctAnswer = riddles[currentRiddleIndex].answer.toLowerCase();
+            
+            if (userAnswer === correctAnswer) {
+                score++;
+                scoreEl.textContent = score;
+                feedbackEl.textContent = "Correct! Well done!";
+                feedbackEl.className = 'feedback correct';
+                submitBtn.style.display = 'none';
+                nextBtn.style.display = 'inline-block';
+            } else {
+                feedbackEl.textContent = "Sorry, that's not right. Try again!";
+                feedbackEl.className = 'feedback incorrect';
+            }
+            
+            isAnswered = true;
+        }
+
+        function nextRiddle() {
+            currentRiddleIndex++;
+            if (currentRiddleIndex >= riddles.length) {
+                // Reset the game when all riddles are done
+                feedbackEl.textContent = `Game Over! Your final score is ${score} out of ${riddles.length}.`;
+                nextBtn.textContent = "Play Again";
+                nextBtn.onclick = resetGame;
+            } else {
+                loadRiddle();
+            }
+        }
+
+        function resetGame() {
+            currentRiddleIndex = 0;
+            score = 0;
+            scoreEl.textContent = score;
+            nextBtn.textContent = "Next Riddle";
+            nextBtn.onclick = nextRiddle;
+            loadRiddle();
+        }
+
+        function showHint() {
+            hintText.textContent = riddles[currentRiddleIndex].hint;
+            hintText.style.display = 'block';
+        }
+
+        // Initialize the game
+        loadRiddle();
+
+        // Event listeners
+        submitBtn.addEventListener('click', checkAnswer);
+        nextBtn.addEventListener('click', nextRiddle);
+        hintBtn.addEventListener('click', showHint);
+        
+        // Allow pressing Enter to submit answer
+        answerInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        });
+
+        // Shuffle riddles for variety
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        // Shuffle riddles at the start
+        shuffleArray(riddles);
+    </script>
+</body>
+</html>
